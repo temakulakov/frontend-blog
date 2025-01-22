@@ -1,0 +1,58 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - prod # Триггер срабатывает при пуше в ветку prod
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Проверяем репозиторий
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Настраиваем Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      # Устанавливаем зависимости
+      - name: Install dependencies
+        run: npm install
+
+      # Собираем проект
+      - name: Build the project
+        run: npm run build
+
+      # Деплой на сервер через SSH
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: 45.128.204.152
+          username: root
+          key: |
+            -----BEGIN OPENSSH PRIVATE KEY-----
+            b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAACFwAAAAdzc2gtcn
+            NhAAAAAwEAAQAAAgEAwsbNYv+Bl2cUBlRPjIil8TdgZtwPQyJWlROb18Fvt41OvRxzsCxN
+            7kvdZi2Upa+EOiaRIsBo6xg8DJX4GDeMVqm2EtxFg3Q5wtqWc97vStHd5KsXEA+f95/d/L
+            lzq569EIkiPo3f4ezIS/BIZrPIAFDd8iwEDA/f3KUdZFKR7Waj8h/Pa2/pbMiJ0wi7Yvwb
+            hu09fZjrhl38IBwNgM1hfsfPig+etSabpINy7ClputznTdkHqmi6j8feu3Yd65FxKFm1go
+            XIZe2bwHgqhEXwz70+1PMcm74JBRO98js2PUEoW7Tqq63NoiCA0aj6lwKhU8IahrEJVSZ8
+            6WIGXNWTarkqI8QEmJNGCKryiT0kz4PCukjxdoru9d5EjQ86zedIwjkE/OvKL96PyEguB6
+            0vQo4oB0OboFHKpuI9aRsCh6nDO9+M2qP/MfZqFsSPcaT2e9AYdRrwkeiIZaE4DMmlgGZN
+            o+Km0kKB6ZvRH3s8gk0iBcu+gU11/TTVupErzxqY6wxdDALtQsi4zwSsGuAj3vNQ4LKSUH
+            3mPgd/AyIjy39WGSFT4NbXNSJLoUa+03D/rB56sDknNpxvkiUfOXPLcrMXZOPrN8PBnsk9
+            Sp6V2F7gnhwn1hrUSqWQu2QKAgXc6Ngq8v2UkzsMMbwVo0mwCqhH3b3yN/v6dB0qmMukqD
+            8AAAdQL6860i+vOtIAAAAHc3NoLXJzYQAAAgEAwsbNYv+Bl2cUBlRPjIil8TdgZtwPQyJW
+            л... (оставшаяся часть ключа)
+            -----END OPENSSH PRIVATE KEY-----
+          script: |
+            cd /home/front
+            git pull origin prod
+            npm install
+            npm run build
+            pm2 restart next
