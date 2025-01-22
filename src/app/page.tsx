@@ -15,7 +15,7 @@ export default function Home() {
 				/>
 				<ol>
 					<li>
-						ХУЕКСТ <code>src/app/page.tsx</code>.
+						ХУЕКСТ <code>ЫЫЫЫЫЫ</code>.
 					</li>
 					<li>Save and see your changes instantly.</li>
 				</ol>
