@@ -41,11 +41,13 @@ jobs:
 
       # Шаг 7: Деплой на сервер через SSH
       - name: Deploy to server
-        run: |
-          ssh root@45.128.204.152 << EOF
-            cd /home/front
-            git pull origin prod
-            npm install
-            npm run build
-            pm2 restart next
-          EOF
+  run: |
+    ssh root@45.128.204.152 << 'EOF'
+      source ~/.bashrc
+      export PATH=$PATH:/root/.nvm/versions/node/v22.13.1/bin
+      cd /home/front
+      git pull origin prod
+      npm install
+      npm run build
+      pm2 restart next
+    EOF
