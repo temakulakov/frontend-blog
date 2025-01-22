@@ -3,42 +3,44 @@ name: Deploy to Production
 on:
   push:
     branches:
-      - prod # Триггер срабатывает при пуше в ветку prod
+      - prod # Запуск при пуше в ветку prod
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Проверяем репозиторий
-      - name: Checkout code
+      # Шаг 1: Проверка репозитория
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Настраиваем Node.js
+      # Шаг 2: Настройка SSH-агента и добавление ключа
+      - name: Start SSH agent
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      # Шаг 3: Настройка Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.18.0' # Укажите совместимую версию Node.js
-          cache: 'npm'
+          node-version: '18.18.0' # Версия Node.js
 
-      # Устанавливаем зависимости
+      # Шаг 4: Установка зависимостей
       - name: Install dependencies
         run: npm install
 
-      # Собираем проект
+      # Шаг 5: Сборка проекта
       - name: Build the project
         run: npm run build
 
-      # Деплой на сервер через SSH
+      # Шаг 6: Деплой на сервер через SSH
       - name: Deploy to server
-        uses: appleboy/ssh-action@v0.1.5
-        with:
-          host: 45.128.204.152
-          username: root
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
+        run: |
+          ssh root@45.128.204.152 << EOF
             cd /home/front
             git pull origin prod
             npm install
             npm run build
             pm2 restart next
+          EOF
