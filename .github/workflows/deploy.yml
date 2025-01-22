@@ -20,21 +20,26 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.ADM_SERVER }}
 
-      # Шаг 3: Настройка Node.js
+      # Шаг 3: Добавляем сервер в список известных хостов
+      - name: Add server to known_hosts
+        run: |
+          ssh-keyscan -H 45.128.204.152 >> ~/.ssh/known_hosts
+
+      # Шаг 4: Настройка Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18.18.0' # Версия Node.js
 
-      # Шаг 4: Установка зависимостей
+      # Шаг 5: Установка зависимостей
       - name: Install dependencies
         run: npm install
 
-      # Шаг 5: Сборка проекта
+      # Шаг 6: Сборка проекта
       - name: Build the project
         run: npm run build
 
-      # Шаг 6: Деплой на сервер через SSH
+      # Шаг 7: Деплой на сервер через SSH
       - name: Deploy to server
         run: |
           ssh root@45.128.204.152 << EOF
