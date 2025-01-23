@@ -1,5 +1,18 @@
-import styles from './page.module.css'
+'use client';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
-export default function Home() {
-	return <div className={styles.page}></div>
-}
+const Example: React.FC = () => {
+  const [data, setData] = useState<any | null>(null);
+
+  useEffect(() => {
+    // Данный код сработает только на клиенте
+    axios
+      .get('https://gachimuchi.fun/api/posts')
+      .then((res) => setData(res.data));
+  }, []);
+
+  return <div>Data: {data || 'Loading...'}</div>;
+};
+
+export default Example;
